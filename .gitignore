@@ -1,0 +1,7 @@
+# C++ build artifacts
+cpp/build/
+
+# Python compiled extensions
+*.so
+*.pyd
+
