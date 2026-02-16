@@ -28,12 +28,12 @@ inline double rr(const std::string& side, double entry, double stop, double targ
     if (is_long) {
         const double risk = entry - stop;
         const double reward = target - entry;
-        if (risk == 0.0) return 0.0;
+        if (risk <= 0.0) return 0.0;  // inverted or flat: no edge
         return reward / risk;
     } else {
         const double risk = stop - entry;
         const double reward = entry - target;
-        if (risk == 0.0) return 0.0;
+        if (risk <= 0.0) return 0.0;
         return reward / risk;
     }
 }

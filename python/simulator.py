@@ -3,10 +3,11 @@
 # - Edge remaining (%), Degradation score, Entry quality classification
 # - Optional: max tolerable delay/slippage boundaries
 #
-# Run examples (from repo root):
+# Run examples (from python/ directory):
 #   python3 simulator.py --side long --E 20000 --S 19995 --T 20020 --tick 0.25 --delay 0.2 --regime Normal
 #   python3 simulator.py --side long --E 20000 --S 19995 --T 20020 --tick 0.25 --delay 2.5 --regime High --boundary
-#   python3 simulator.py --mc 20000 --seed 7 --side long --E 20000 --S 19995 --T 20020 --tick 0.25 --delay 2.0 --regime High
+#   python3 simulator.py --mc 200 --seed 7 --side long --E 20000 --S 19995 --T 20020 --tick 0.25 --delay 2.0 --regime High
+# With boundary + Monte Carlo: --mc 100 --boundary (works; single sim used for lateness context)
 
 from __future__ import annotations
 
@@ -28,9 +29,6 @@ try:
     from regimes import REGIMES, RegimeParams  # type: ignore
 except Exception:
     # Fallback if simulator.py is run standalone without regimes.py
-    from dataclasses import dataclass
-    from typing import Dict
-
     @dataclass(frozen=True)
     class RegimeParams:
         sigma_per_sqrt_s_ticks: float
@@ -109,6 +107,19 @@ class SimResult:
 
 
 # -----------------------------
+# Parameter usage (audit: all spec/inp/regime fields are used in simulate_once)
+# -----------------------------
+# TradeSpec: side, ideal_entry, stop, target, tick_size -> RR, actual_entry, lateness, stop expansion
+#   max_entry_distance_ticks -> rule penalty (entry too far), stop expansion lateness_factor
+#   max_late_ticks_gate -> rule penalty (hard gate), details
+#   min_rr -> rule penalty (RR too low)
+#   allow_stop_expansion -> gates stop expansion block
+#   max_stop_ticks -> stop expansion clamp, rule penalty (stop too big)
+# SimInput: delay_seconds -> delay path; regime -> REGIMES lookup (rp); forced_slip_ticks -> slip path
+# RegimeParams: sigma_per_sqrt_s_ticks -> delay sigma; slip_mu_ticks, slip_sigma_ticks -> slip sampling
+#   stop_k_regime, stop_k_late -> stop expansion multiplier (when allow_stop_expansion)
+# Fixed constants (not in config): zcap=6, adverse_bias=0.35, classify 80/50%, degradation 0.7/0.2/0.1
+# -----------------------------
 # Edge & simulation logic
 # -----------------------------
 def compute_edge_R(side: str, entry: float, stop: float, target: float) -> float:
@@ -157,16 +168,17 @@ def simulate_once(spec: TradeSpec, inp: SimInput, rng: Optional[random.Random] =
 
     # 1) Delay -> price moves (ticks), with slight adverse bias (optional)
     delay = max(0.0, float(inp.delay_seconds))
-    sigma_delay_ticks = rp.sigma_per_sqrt_s_ticks * math.sqrt(max(delay, 1e-9))
-
-    delta_delay_ticks = rng.gauss(0.0, sigma_delay_ticks)
-    # Prevent absurd Gaussian outliers from dominating results (truncated normal)
-    zcap = 6.0
-    max_move = zcap * sigma_delay_ticks
-    delta_delay_ticks = clamp(delta_delay_ticks, -max_move, max_move)
-
-    adverse_bias_ticks = 0.35 * sigma_delay_ticks  # small bias: being late is usually worse on average
-    delta_delay_ticks += sgn * adverse_bias_ticks
+    if delay <= 0.0:
+        delta_delay_ticks = 0.0
+    else:
+        sigma_delay_ticks = rp.sigma_per_sqrt_s_ticks * math.sqrt(delay)
+        delta_delay_ticks = rng.gauss(0.0, sigma_delay_ticks)
+        # Prevent absurd Gaussian outliers from dominating results (truncated normal)
+        zcap = 6.0
+        max_move = zcap * sigma_delay_ticks
+        delta_delay_ticks = clamp(delta_delay_ticks, -max_move, max_move)
+        adverse_bias_ticks = 0.35 * sigma_delay_ticks  # being late is usually worse on average
+        delta_delay_ticks += sgn * adverse_bias_ticks
 
     entry_pre_slip = spec.ideal_entry + ticks_to_price(delta_delay_ticks, tick)
 
@@ -592,6 +604,8 @@ def main() -> None:
         print(f"used_stop:    {r.used_stop}\n")
 
     if args.boundary:
+        # Single sim for boundary context (lateness display); safe when --mc was used (r not set)
+        r = simulate_once(spec, inp, rng=random.Random(args.seed))
         forced_slip_for_delay = 0.0 if args.slip is None else float(args.slip)
 
         max_slip = max_slippage_allowed_prob(
@@ -641,8 +655,7 @@ def main() -> None:
             f"late_gate: {args.max_late_gate} ticks"
         )
 
-        # Context from the *single sim* result `r`
-        # (This assumes you ran `r = simulate_once(...)` earlier in main, which you did.)
+        # Context from a single sim at (delay, slip) for lateness display
         print(
             f"Current lateness: {r.details['lateness_ticks']:.2f} ticks "
             f"(gate = {r.details['late_gate_ticks']:.1f} ticks)"
