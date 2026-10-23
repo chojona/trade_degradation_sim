@@ -36,7 +36,12 @@ def percentile(xs, p):
 
 def environment():
     cache = ROOT / 'cpp/build/release/CMakeCache.txt'
+    entries = {line.split('=', 1)[0].split(':', 1)[0]: line.split('=', 1)[1]
+               for line in cache.read_text().splitlines()
+               if '=' in line and not line.startswith(('#', '//'))}
+    pybind_source = Path(entries['pybind11_SOURCE_DIR'])
     return {
+        'benchmark_runner_sha256': sha(__file__),
         'recorded_utc': datetime.now(timezone.utc).isoformat(),
         'python': sys.version, 'executable': sys.executable,
         'platform': platform.platform(), 'machine': platform.machine(),
@@ -44,7 +49,7 @@ def environment():
         'logical_cpus': command('/usr/sbin/sysctl', '-n', 'hw.logicalcpu'),
         'memory_bytes': command('/usr/sbin/sysctl', '-n', 'hw.memsize'),
         'compiler': command('c++', '--version'), 'cmake': command('cmake', '--version'),
-        'pybind11_commit': command('git', '-C', str(ROOT / 'cpp/build/_deps/pybind11-src'), 'rev-parse', 'HEAD'),
+        'pybind11_commit': command('git', '-C', str(pybind_source), 'rev-parse', 'HEAD'),
         'revision': command('git', 'rev-parse', 'HEAD'),
         'tracked_changes': command('git', 'diff', '--name-only'),
         'source_sha256': {name: sha(ROOT / name) for name in
