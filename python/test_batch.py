@@ -1,6 +1,6 @@
 from array import array
 from concurrent.futures import ThreadPoolExecutor
-from dataclasses import asdict
+from dataclasses import asdict, replace
 import math
 import unittest
 import batch as b
@@ -63,6 +63,16 @@ class NativeBatchTests(unittest.TestCase):
         self.assertEqual(rows[0][0], 20000.25)
         self.assertAlmostEqual(rows[0][3], 19.75 / 5.25)
         self.assertAlmostEqual(native.edge_remaining_mean, 100 * (19.75 / 5.25) / 4)
+
+    def test_hard_rules_and_exact_gate_in_native_kernel(self):
+        inp = s.SimInput(0)
+        cases = [(replace(plan(), min_rr=5), 0, 0, 2),
+                 (replace(plan(), max_stop_ticks=20), 0, 4, 2),
+                 (plan(), 4, 0, 1), (plan(), 4.01, 0, 2)]
+        for p, delta, slip, expected_code in cases:
+            stats, rows = b.evaluate_samples(p, inp, array('d', [delta]), array('d', [slip]), backend='cpp', include_samples=True)
+            self.assertEqual(rows[0][-1], expected_code)
+            self.compare(p, inp, array('d', [delta]), array('d', [slip]))
 
     def test_percentiles_ties_to_even(self):
         for n in (1, 2, 6, 16, 36, 46, 96):
