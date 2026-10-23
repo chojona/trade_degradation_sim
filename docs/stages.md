@@ -53,3 +53,34 @@ A bounded batch prototype is justified to test this bottleneck, with common draw
 and materialization included in measurements. Remaining risks: single machine,
 uncontrolled scheduling/power, uncalibrated model, backend RNG portability and
 conversion overhead. Numerical tests still pass; the benchmark changes no model.
+
+## Stage P1b — batched prototype and interface proposal
+
+Branch: `codex/p1-batched-prototype`, based on benchmark commit `cd25e42`.
+Prototype source snapshot `b452ace`; raw benchmark under `benchmarks/`.
+
+Added a validated explicit-draw native batch kernel, readable Python reference,
+seeded shared draw generator and optional detailed samples. Native inputs are
+copied under the GIL; evaluation releases it and uses local state. Percentile
+indices use nearest/ties-to-even; aggregation uses compensated summation. No new
+native RNG, internal threading, external data, or main-project imports.
+
+Final validation: **43 native-enabled tests passed, no skips**. Python 3.9 fallback
+ran 43 tests: **32 passed, 11 native tests skipped**. Tests cover all regimes,
+both sides, expansion, rule thresholds, decimal/signed price grids, summaries,
+individual sample parity, percentile ties, input validation, concurrent calls and
+unchanged input buffers. `git diff --check` passed.
+
+Measured 10,000-trial summary-only throughput improvement over the matching Python
+reference: **190.55–195.76x evaluation-only**, **5.05–6.07x sampling-to-summary**.
+Detailed output reduces these ratios. Maximum observed detailed numerical error
+was `7.106e-15`; no classifications differed. All environment, source hashes,
+repeat timings and latency samples are retained. One workstation and synthetic
+assumptions only; no historical/live performance conclusion.
+
+`docs/read-only-integration-proposal.md` specifies a proposed approved-export-only
+boundary with unchanged eligibility, causal timing, lineage and cost ownership.
+No adapter was built or connected. P1 ends here. Further P2 integration requires
+explicit human approval. Remaining risks: hypothetical distributions, Python
+sampling bottleneck, cross-runtime random-stream/float variation, O(n) percentile
+storage, detailed output allocations, and target-workload portability.
