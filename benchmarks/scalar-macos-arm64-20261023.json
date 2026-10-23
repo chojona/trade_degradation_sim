@@ -1,0 +1,478 @@
+{
+  "schema": "tds-scalar-benchmark-v1",
+  "environment": {
+    "recorded_utc": "2026-10-23T12:18:39.699600+00:00",
+    "python": "3.12.13 (main, Mar  3 2026, 12:39:30) [Clang 17.0.0 (clang-1700.6.3.2)]",
+    "executable": "/opt/homebrew/opt/python@3.12/bin/python3.12",
+    "platform": "macOS-26.6.2-arm64-arm-64bit",
+    "machine": "arm64",
+    "processor": "Apple M4",
+    "logical_cpus": "10",
+    "memory_bytes": "17179869184",
+    "compiler": "Apple clang version 21.0.0 (clang-2100.1.1.101)\nTarget: arm64-apple-darwin25.6.0\nThread model: posix\nInstalledDir: /Library/Developer/CommandLineTools/usr/bin",
+    "cmake": "cmake version 4.2.3\n\nCMake suite maintained and supported by Kitware (kitware.com/cmake).",
+    "pybind11_commit": "3e9dfa2866941655c56877882565e7577de6fc7b",
+    "revision": "7b9e110ce52ffcf5bd52132f91d8a7a359ffd029",
+    "tracked_changes": "",
+    "source_sha256": {
+      "python/simulator.py": "0f6533b3a789b875ab120303f7fd51596f0927b6bc92ccbd21c397db2b66201c",
+      "python/regimes.py": "602512177a3081f229a6a822760a5f6d834df740bac8bf418fcbdba319fb4a7f",
+      "cpp/degradation.hpp": "d6eb53c408b72f7e9e58b3c0a062ad4fc9b670ebeaaf360ae01a529b4e38cd64",
+      "cpp/bindings.cpp": "3ade8835ed09dfbb0c8ecbde7d6f559c93a46c6fd09364d87356eb11846d7b2d",
+      "cpp/CMakeLists.txt": "1aa3cfc8842aa44ef0ffd35b57ca057640cc749c355c19de0e341136806ef563"
+    },
+    "extension": "/Users/jonathancho/Desktop/Projects/trade_degradation_sim/python/trade_degradation_cpp.cpython-312-darwin.so",
+    "extension_sha256": "ae5e066c8c9e25281366b7e8e062970b7ef97754d89ca11be5e5ac72a6e15c3d",
+    "build_configuration": [
+      "CMAKE_BUILD_TYPE:STRING=Release",
+      "CMAKE_CXX_FLAGS:STRING=",
+      "CMAKE_CXX_FLAGS_RELEASE:STRING=-O3 -DNDEBUG"
+    ],
+    "execution": "single process, one Python thread, warmed extension; OS scheduling and power state uncontrolled",
+    "timer": "perf_counter_ns; latency includes timer/invocation overhead; no overhead subtraction"
+  },
+  "seed": 7,
+  "trials_per_repeat": 10000,
+  "repeats": 7,
+  "comparison": "P0-corrected Python versus P0-corrected scalar extension, identical seeded workloads",
+  "cases": [
+    {
+      "spec": {
+        "side": "long",
+        "ideal_entry": 20000,
+        "stop": 19995,
+        "target": 20020,
+        "tick_size": 0.25,
+        "max_entry_distance_ticks": 12.0,
+        "max_late_ticks_gate": 4.0,
+        "min_rr": 1.0,
+        "allow_stop_expansion": false,
+        "max_stop_ticks": 60.0
+      },
+      "input": {
+        "delay_seconds": 2,
+        "regime": "High",
+        "forced_slip_ticks": null
+      },
+      "numerical": {
+        "samples": 10000,
+        "max_absolute_error": 0.0,
+        "rr_retention_sum": 850239.6607586165,
+        "entry_sum": 200006923.75,
+        "counts": {
+          "Clean": 6150,
+          "Compromised": 1298,
+          "Invalid": 2552
+        },
+        "first_result": {
+          "actual_entry": 20000.75,
+          "used_stop": 19995,
+          "edge_ideal_R": 4.0,
+          "edge_actual_R": 3.347826086956522,
+          "edge_remaining_pct": 83.69565217391305,
+          "degradation_score": 14.413043478260862,
+          "classification": "Clean",
+          "details": {
+            "regime": "High",
+            "delay_seconds": 2,
+            "delta_delay_ticks": 0.21296859610247543,
+            "slip_ticks": 2,
+            "lateness_ticks": 3.0,
+            "late_gate_ticks": 4.0,
+            "edge_ratio": 0.8369565217391305,
+            "edge_remaining_unclamped_pct": 83.69565217391305,
+            "cpp_path": false,
+            "rr_ideal": 4.0,
+            "rr_actual": 3.347826086956522,
+            "rule_penalty": 0.0,
+            "stop_ticks_used": 23.0,
+            "metric": "reward_risk_retention_not_expected_profitability"
+          }
+        }
+      },
+      "measurements": {
+        "python": {
+          "seconds": [
+            0.078941,
+            0.079926458,
+            0.078911416,
+            0.07791575,
+            0.078676875,
+            0.078354417,
+            0.077035833
+          ],
+          "trials_per_second": 127102.15040950725,
+          "latency_ns_p50": 7292,
+          "latency_ns_p95": 10250,
+          "latency_ns_p99": 15541,
+          "latency_samples": 1000,
+          "checksums": [
+            850239.6607586165,
+            850239.6607586165,
+            850239.6607586165,
+            850239.6607586165,
+            850239.6607586165,
+            850239.6607586165,
+            850239.6607586165
+          ]
+        },
+        "cpp": {
+          "seconds": [
+            0.068333791,
+            0.0690705,
+            0.0689575,
+            0.069921958,
+            0.070594917,
+            0.069561084,
+            0.070864459
+          ],
+          "trials_per_second": 143758.54177315583,
+          "latency_ns_p50": 7167,
+          "latency_ns_p95": 7625,
+          "latency_ns_p99": 10083,
+          "latency_samples": 1000,
+          "checksums": [
+            850239.6607586165,
+            850239.6607586165,
+            850239.6607586165,
+            850239.6607586165,
+            850239.6607586165,
+            850239.6607586165,
+            850239.6607586165
+          ]
+        }
+      },
+      "cpp_throughput_ratio_to_python": 1.131047282126886
+    },
+    {
+      "spec": {
+        "side": "long",
+        "ideal_entry": 20000,
+        "stop": 19995,
+        "target": 20020,
+        "tick_size": 0.25,
+        "max_entry_distance_ticks": 12.0,
+        "max_late_ticks_gate": 4.0,
+        "min_rr": 1.0,
+        "allow_stop_expansion": true,
+        "max_stop_ticks": 60.0
+      },
+      "input": {
+        "delay_seconds": 2,
+        "regime": "High",
+        "forced_slip_ticks": null
+      },
+      "numerical": {
+        "samples": 10000,
+        "max_absolute_error": 0.0,
+        "rr_retention_sum": 749946.5336824794,
+        "entry_sum": 200006923.75,
+        "counts": {
+          "Clean": 3218,
+          "Compromised": 4230,
+          "Invalid": 2552
+        },
+        "first_result": {
+          "actual_entry": 20000.75,
+          "used_stop": 19994.25,
+          "edge_ideal_R": 4.0,
+          "edge_actual_R": 2.9615384615384617,
+          "edge_remaining_pct": 74.03846153846155,
+          "degradation_score": 24.17307692307692,
+          "classification": "Compromised",
+          "details": {
+            "regime": "High",
+            "delay_seconds": 2,
+            "delta_delay_ticks": 0.21296859610247543,
+            "slip_ticks": 2,
+            "lateness_ticks": 3.0,
+            "late_gate_ticks": 4.0,
+            "edge_ratio": 0.7403846153846154,
+            "edge_remaining_unclamped_pct": 74.03846153846155,
+            "cpp_path": false,
+            "rr_ideal": 4.0,
+            "rr_actual": 2.9615384615384617,
+            "rule_penalty": 0.0,
+            "stop_ticks_used": 26.0,
+            "metric": "reward_risk_retention_not_expected_profitability"
+          }
+        }
+      },
+      "measurements": {
+        "cpp": {
+          "seconds": [
+            0.082976875,
+            0.08339275,
+            0.083878542,
+            0.0835425,
+            0.0845005,
+            0.083612166,
+            0.084446375
+          ],
+          "trials_per_second": 119599.81995921502,
+          "latency_ns_p50": 8584,
+          "latency_ns_p95": 8833,
+          "latency_ns_p99": 10916,
+          "latency_samples": 1000,
+          "checksums": [
+            749946.5336824794,
+            749946.5336824794,
+            749946.5336824794,
+            749946.5336824794,
+            749946.5336824794,
+            749946.5336824794,
+            749946.5336824794
+          ]
+        },
+        "python": {
+          "seconds": [
+            0.093239,
+            0.09312875,
+            0.093446667,
+            0.094085625,
+            0.09335025,
+            0.092640875,
+            0.092280584
+          ],
+          "trials_per_second": 107251.25752099443,
+          "latency_ns_p50": 9375,
+          "latency_ns_p95": 9542,
+          "latency_ns_p99": 11833,
+          "latency_samples": 1000,
+          "checksums": [
+            749946.5336824794,
+            749946.5336824794,
+            749946.5336824794,
+            749946.5336824794,
+            749946.5336824794,
+            749946.5336824794,
+            749946.5336824794
+          ]
+        }
+      },
+      "cpp_throughput_ratio_to_python": 1.115136761317725
+    },
+    {
+      "spec": {
+        "side": "short",
+        "ideal_entry": 20000,
+        "stop": 20005,
+        "target": 19980,
+        "tick_size": 0.25,
+        "max_entry_distance_ticks": 12.0,
+        "max_late_ticks_gate": 4.0,
+        "min_rr": 1.0,
+        "allow_stop_expansion": false,
+        "max_stop_ticks": 60.0
+      },
+      "input": {
+        "delay_seconds": 2,
+        "regime": "High",
+        "forced_slip_ticks": null
+      },
+      "numerical": {
+        "samples": 10000,
+        "max_absolute_error": 0.0,
+        "rr_retention_sum": 850313.748518377,
+        "entry_sum": 199993079.0,
+        "counts": {
+          "Clean": 6127,
+          "Compromised": 1304,
+          "Invalid": 2569
+        },
+        "first_result": {
+          "actual_entry": 19999.0,
+          "used_stop": 20005,
+          "edge_ideal_R": 4.0,
+          "edge_actual_R": 3.1666666666666665,
+          "edge_remaining_pct": 79.16666666666666,
+          "degradation_score": 18.583333333333336,
+          "classification": "Compromised",
+          "details": {
+            "regime": "High",
+            "delay_seconds": 2,
+            "delta_delay_ticks": -1.3709505937553912,
+            "slip_ticks": 2,
+            "lateness_ticks": 4.0,
+            "late_gate_ticks": 4.0,
+            "edge_ratio": 0.7916666666666666,
+            "edge_remaining_unclamped_pct": 79.16666666666666,
+            "cpp_path": false,
+            "rr_ideal": 4.0,
+            "rr_actual": 3.1666666666666665,
+            "rule_penalty": 0.0,
+            "stop_ticks_used": 24.0,
+            "metric": "reward_risk_retention_not_expected_profitability"
+          }
+        }
+      },
+      "measurements": {
+        "python": {
+          "seconds": [
+            0.077099459,
+            0.080003,
+            0.080509083,
+            0.081221917,
+            0.079448625,
+            0.079364084,
+            0.080260583
+          ],
+          "trials_per_second": 124995.31267577465,
+          "latency_ns_p50": 8292,
+          "latency_ns_p95": 8542,
+          "latency_ns_p99": 10625,
+          "latency_samples": 1000,
+          "checksums": [
+            850313.748518377,
+            850313.748518377,
+            850313.748518377,
+            850313.748518377,
+            850313.748518377,
+            850313.748518377,
+            850313.748518377
+          ]
+        },
+        "cpp": {
+          "seconds": [
+            0.128921708,
+            0.081677042,
+            0.146811708,
+            0.140444042,
+            0.13318325,
+            0.1027735,
+            0.104756125
+          ],
+          "trials_per_second": 77566.45606960157,
+          "latency_ns_p50": 7208,
+          "latency_ns_p95": 7458,
+          "latency_ns_p99": 9125,
+          "latency_samples": 1000,
+          "checksums": [
+            850313.748518377,
+            850313.748518377,
+            850313.748518377,
+            850313.748518377,
+            850313.748518377,
+            850313.748518377,
+            850313.748518377
+          ]
+        }
+      },
+      "cpp_throughput_ratio_to_python": 0.6205549184936334
+    },
+    {
+      "spec": {
+        "side": "short",
+        "ideal_entry": 20000,
+        "stop": 20005,
+        "target": 19980,
+        "tick_size": 0.25,
+        "max_entry_distance_ticks": 12.0,
+        "max_late_ticks_gate": 4.0,
+        "min_rr": 1.0,
+        "allow_stop_expansion": true,
+        "max_stop_ticks": 60.0
+      },
+      "input": {
+        "delay_seconds": 2,
+        "regime": "High",
+        "forced_slip_ticks": null
+      },
+      "numerical": {
+        "samples": 10000,
+        "max_absolute_error": 0.0,
+        "rr_retention_sum": 750096.8602162394,
+        "entry_sum": 199993079.0,
+        "counts": {
+          "Clean": 3246,
+          "Compromised": 4185,
+          "Invalid": 2569
+        },
+        "first_result": {
+          "actual_entry": 19999.0,
+          "used_stop": 20006.0,
+          "edge_ideal_R": 4.0,
+          "edge_actual_R": 2.7142857142857144,
+          "edge_remaining_pct": 67.85714285714286,
+          "degradation_score": 30.499999999999993,
+          "classification": "Compromised",
+          "details": {
+            "regime": "High",
+            "delay_seconds": 2,
+            "delta_delay_ticks": -1.3709505937553912,
+            "slip_ticks": 2,
+            "lateness_ticks": 4.0,
+            "late_gate_ticks": 4.0,
+            "edge_ratio": 0.6785714285714286,
+            "edge_remaining_unclamped_pct": 67.85714285714286,
+            "cpp_path": false,
+            "rr_ideal": 4.0,
+            "rr_actual": 2.7142857142857144,
+            "rule_penalty": 0.0,
+            "stop_ticks_used": 28.0,
+            "metric": "reward_risk_retention_not_expected_profitability"
+          }
+        }
+      },
+      "measurements": {
+        "cpp": {
+          "seconds": [
+            0.086745375,
+            0.088040875,
+            0.087268042,
+            0.088997083,
+            0.087599625,
+            0.085409708,
+            0.086466208
+          ],
+          "trials_per_second": 114589.48511758748,
+          "latency_ns_p50": 8959,
+          "latency_ns_p95": 9250,
+          "latency_ns_p99": 11042,
+          "latency_samples": 1000,
+          "checksums": [
+            750096.8602162394,
+            750096.8602162394,
+            750096.8602162394,
+            750096.8602162394,
+            750096.8602162394,
+            750096.8602162394,
+            750096.8602162394
+          ]
+        },
+        "python": {
+          "seconds": [
+            0.095728375,
+            0.0958265,
+            0.095321541,
+            0.094001875,
+            0.09490925,
+            0.093974625,
+            0.096393416
+          ],
+          "trials_per_second": 104908.08158462314,
+          "latency_ns_p50": 9750,
+          "latency_ns_p95": 9958,
+          "latency_ns_p99": 11417,
+          "latency_samples": 1000,
+          "checksums": [
+            750096.8602162394,
+            750096.8602162394,
+            750096.8602162394,
+            750096.8602162394,
+            750096.8602162394,
+            750096.8602162394,
+            750096.8602162394
+          ]
+        }
+      },
+      "cpp_throughput_ratio_to_python": 1.0922846303805005
+    }
+  ],
+  "limitations": [
+    "Synthetic uncalibrated scenarios; not historical or live latency.",
+    "One workstation and build; scheduling, thermal and power state uncontrolled.",
+    "Scalar paths retain Python sampling, validation, classification, and object construction.",
+    "Does not compare the original defective formulas to corrected formulas."
+  ]
+}
