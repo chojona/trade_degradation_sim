@@ -23,6 +23,10 @@ PYBIND11_MODULE(trade_degradation_cpp, m) {
         .def_readonly("edge_remaining_clamped_pct", &tds::EdgeMetrics::edge_remaining_clamped_pct)
         .def_readonly("edge_remaining_unclamped_pct", &tds::EdgeMetrics::edge_remaining_unclamped_pct);
 
+    m.def("edge_metrics_with_stops", &tds::edge_metrics_with_stops,
+          py::arg("side"), py::arg("ideal_entry"), py::arg("actual_entry"),
+          py::arg("original_stop"), py::arg("used_stop"), py::arg("target"));
+
     m.def("edge_metrics", &tds::edge_metrics,
           py::arg("side"), py::arg("ideal_entry"), py::arg("actual_entry"),
           py::arg("stop"), py::arg("target"));
