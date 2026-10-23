@@ -62,3 +62,13 @@ checks are explicitly skipped. Do not interpret skipped tests as native parity.
 This project is independent of the main backtester. Nothing here reads historical
 research artifacts, held-out outcomes, certification, authorization mappings, or
 trading accounts. See `docs/stages.md` for staged validation and limitations.
+
+## Experimental P1 batch prototype
+
+`python/batch.py` provides an explicit Python reference and native batch backend.
+Python generates common seeded float64 draws; C++ snapshots them and releases the
+GIL for numerical evaluation. `run_batch(..., backend='cpp')` includes sampling;
+`evaluate_samples` measures already-generated draws. Detailed samples are optional.
+See `docs/read-only-integration-proposal.md` for the proposed future boundary.
+There is no connection to the main backtester. See `benchmarks/README.md` for
+measured workloads and limits, rather than assuming that native code is faster.
