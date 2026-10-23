@@ -155,7 +155,8 @@ class TestCppParity(unittest.TestCase):
             actual_cpp = cpp.actual_entry_from_ticks(side, ideal, tick, delta_delay_ticks, slip_ticks)
             sgn = 1.0 if side == "long" else -1.0
             total_ticks = delta_delay_ticks + sgn * slip_ticks
-            actual_py = ideal + ticks_to_price(total_ticks, tick)
+            from simulator import round_grid
+            actual_py = round_grid(ideal + ticks_to_price(total_ticks, tick), tick, int(sgn))
             self.assertAlmostEqual(actual_cpp, actual_py)
 
     def test_cpp_edge_metrics_matches_python(self):
@@ -273,9 +274,8 @@ class TestRegimes(unittest.TestCase):
 
     def test_unknown_regime_raises(self):
         spec = _make_spec()
-        inp = SimInput(delay_seconds=0.0, regime="UnknownRegime", forced_slip_ticks=0.0)
         with self.assertRaises(ValueError):
-            simulate_once(spec, inp, rng=random.Random(0))
+            SimInput(delay_seconds=0.0, regime="UnknownRegime", forced_slip_ticks=0.0)
 
 
 if __name__ == "__main__":

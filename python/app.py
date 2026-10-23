@@ -3,6 +3,7 @@
 # Run from repo root:
 #   streamlit run python/app.py
 
+import random
 import streamlit as st
 from monte_carlo import run_monte_carlo
 
@@ -20,7 +21,7 @@ from simulator import (
 
 st.set_page_config(page_title="Trade Degradation Simulator", layout="wide")
 st.title("Trade Degradation Simulator")
-st.caption("Quantify how much edge is gone by the time you enter.")
+st.caption("Hypothetical reward/risk retention; not expected profitability or a live execution model.")
 
 # -----------------------------
 # Sidebar: trade + model inputs
@@ -54,7 +55,7 @@ with st.sidebar:
 
     st.divider()
     st.header("Probabilistic boundary")
-    edge_floor = st.slider("Edge floor (%)", 0.0, 100.0, 70.0, 1.0)
+    edge_floor = st.slider("RR retention floor (%)", 0.0, 100.0, 70.0, 1.0)
     p_bad = st.slider("p_bad threshold", 0.05, 0.95, 0.40, 0.01)
     trials = st.slider("Trials per step", 50, 2000, 300, 50)
     seed = st.number_input("Seed", value=7, step=1)
@@ -85,7 +86,7 @@ inp = SimInput(
 # -----------------------------
 # Compute single simulation
 # -----------------------------
-r = simulate_once(spec, inp)
+r = simulate_once(spec, inp, rng=random.Random(int(seed)))
 
 # -----------------------------
 # Layout
@@ -96,7 +97,7 @@ with col1:
     st.subheader("Single Simulation")
     c1, c2, c3, c4 = st.columns(4)
     c1.metric("Classification", r.classification)
-    c2.metric("Edge remaining (clamped)", f"{r.edge_remaining_pct:.2f}%")
+    c2.metric("RR retained (clamped)", f"{r.edge_remaining_pct:.2f}%")
     c3.metric("Degradation score", f"{r.degradation_score:.2f}/100")
     c4.metric("RR (ideal → actual)", f"{r.edge_ideal_R:.2f}R → {r.edge_actual_R:.2f}R")
 
@@ -146,7 +147,7 @@ with col2:
         seed=int(seed),
     )
 
-    p_at_max_slip = prob_bad(
+    p_at_max_slip = None if max_slip is None else prob_bad(
         spec,
         SimInput(delay_seconds=float(delay), regime=regime, forced_slip_ticks=float(max_slip)),
         edge_floor_pct=float(edge_floor),
@@ -154,7 +155,7 @@ with col2:
         seed=int(seed),
     )
 
-    p_at_max_delay = prob_bad(
+    p_at_max_delay = None if max_delay is None else prob_bad(
         spec,
         SimInput(delay_seconds=float(max_delay), regime=regime, forced_slip_ticks=0.0),
         edge_floor_pct=float(edge_floor),
@@ -162,19 +163,19 @@ with col2:
         seed=int(seed),
     )
 
-    st.metric("Edge floor", f"{edge_floor:.0f}%")
+    st.metric("RR retention floor", f"{edge_floor:.0f}%")
     st.metric("Current lateness", f"{d['lateness_ticks']:.2f} ticks (gate {d['late_gate_ticks']})")
 
     st.divider()
-    st.metric("Max slippage allowed", f"{max_slip} ticks")
-    st.caption(f"P(bad) @ max_slip: {p_at_max_slip:.3f}")
+    st.metric("Max slippage allowed", "Infeasible" if max_slip is None else f"{max_slip} ticks")
+    st.caption("Baseline fails" if p_at_max_slip is None else f"Estimated P(bad) @ max_slip: {p_at_max_slip:.3f}")
 
     st.divider()
-    st.metric("Max delay allowed", f"{max_delay:.3f} s (assuming 0 slip)")
-    st.caption(f"P(bad) @ max_delay: {p_at_max_delay:.3f}")
+    st.metric("Max delay allowed", "Infeasible" if max_delay is None else f"{max_delay:.3f} s (assuming 0 slip)")
+    st.caption("Baseline fails" if p_at_max_delay is None else f"Estimated P(bad) @ max_delay: {p_at_max_delay:.3f}; sampled 0.1s prefix only")
 
     st.divider()
-    st.caption("Tip: Tighten the filter by increasing Edge floor or p_bad, or lowering late_gate.")
+    st.caption("Tip: Tighten the filter by increasing RR retention floor or p_bad, or lowering late_gate.")
 
 st.divider()
 st.subheader("Quick Presets")
@@ -203,8 +204,9 @@ if st.button("Run Monte Carlo Simulation"):
     })
 
     # Simple histogram via bar_chart (Streamlit-native)
-    st.write("**Edge Remaining Distribution (%)**")
-    st.bar_chart(edges)
+    st.write("**RR Retained Distribution (%)**")
+    buckets = {str(lo): sum(lo <= e < lo + 10 or (lo == 90 and e == 100) for e in edges) for lo in range(0, 100, 10)}
+    st.bar_chart({"RR bin lower bound": list(range(0, 100, 10)), "Trials": list(buckets.values())}, x="RR bin lower bound", y="Trials")
 
 
 preset_col1, preset_col2, preset_col3 = st.columns(3)

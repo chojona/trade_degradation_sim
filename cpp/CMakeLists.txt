@@ -7,6 +7,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 # Put the built Python extension module into ../python for easy importing
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_CURRENT_LIST_DIR}/../python)
 
+set(PYBIND11_FINDPYTHON ON)
 include(FetchContent)
 
 # ---- Python (headers + libs) ----
