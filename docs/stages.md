@@ -38,3 +38,18 @@ extension loaded under Python 3.12.13. CLI native/boundary smoke passed and emit
 reruns, infeasible display paths, and histogram counts (not browser rendering).
 Python source parsing and `git diff --check` passed. No benchmark yet. Correctness
 checks justify proceeding to P1 scalar measurements.
+
+## Stage P1a — scalar benchmark
+
+Branch: `codex/p1-scalar-benchmarks`, based on P0 commit `7b9e110`.
+The runner, raw results and environment are under `benchmarks/`. Four paired
+10,000-trial cases had **zero numerical error**; timing used seven repeats and
+1,000 individual latency samples per backend/case. Scalar native/Python
+throughput ratios were **1.131, 1.115, 0.621, 1.092**. No consistent acceleration
+is established, and the short/fixed timings are variable. No live latency claim.
+
+The native functions remain scalar while Python owns the trial loop and sampling.
+A bounded batch prototype is justified to test this bottleneck, with common draws
+and materialization included in measurements. Remaining risks: single machine,
+uncontrolled scheduling/power, uncalibrated model, backend RNG portability and
+conversion overhead. Numerical tests still pass; the benchmark changes no model.
